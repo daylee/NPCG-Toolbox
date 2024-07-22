@@ -1,4 +1,4 @@
-# NPCG-Toolbox
+# NPCG Toolbox
 Numerical Predictor Corrector Guidance Toolbox (Iowa State University)
 
 - Version management: Dr. Bong Wie (bong@iastate.edu)
