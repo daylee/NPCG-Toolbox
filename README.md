@@ -8,6 +8,6 @@ Numerical Predictor Corrector Guidance Toolbox (Iowa State University)
 - Programming engineer: Dr. Youngro Lee (youngro@iastate.edu)
 
 
-References
+Main references
 
 https://doi.org/10.1016/j.actaastro.2023.11.045
