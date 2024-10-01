@@ -9,7 +9,7 @@
 % output = state variables represented in PCR frame
 
 function [rn, thetan, phin, Vn, gamman, psin] = ...
-    Aux_pci2pcr(ri, thetai, phii, Vi, gammai,  psii, w)
+    cal_pci2pcr(ri, thetai, phii, Vi, gammai,  psii, w)
 
 % angles
 sth  = sin(thetai); cth = cos(thetai);  sphi = sin(phii); cphi = cos(phii);

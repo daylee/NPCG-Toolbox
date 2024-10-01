@@ -1,6 +1,13 @@
 
 % ----------------------------------------------------------------------- %
 % calculate air denstiy
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
 % input  = altitude in m
 % output = air density in kg/m^3

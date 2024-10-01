@@ -1,11 +1,18 @@
 
 % ----------------------------------------------------------------------- %
-% three-dimensional entry vehicle dynamic equations
+% 3-degree of freedom equations of motion of the entry vehicle
 % based on planet-centered rotating frame and north-east-down frame
 % time is the independent variable
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
 
-function Xdot = Aux_dyn(t, X, sigma, auxdata)
+function Xdot = aux_dyn(t, X, sigma, auxdata)
 
 % auxdata
 pn = auxdata.pn;
@@ -35,7 +42,7 @@ D = D/DU*TU^2; % unitless drag
 L = L/DU*TU^2; % unitless lift
 g = mu*r^-2;   % unitless gravity
 
-% 3-DOF entry dynamics
+% time domain 3-DoF entry dynamics
 rdot     = V*sin(gamma);
 thetadot = V*cos(gamma)*sin(psi)/(r*cos(phi));
 phidot   = (V/r)*cos(gamma)*cos(psi);

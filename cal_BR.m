@@ -4,18 +4,25 @@
 % Tu, K. Y., Munir, M. S., Mease, K. D., & Bayard, D. S. (2000).
 % Drag-based predictive tracking guidance for Mars precision landing.
 % Journal of Guidance, Control, and Dynamics, 23(4), 620-628.
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
 % input  = current state, previous bank sign
 % output = bank sign
 
-function BR = Aux_BR(X, BR, ex_case, auxdata)
+function BR = cal_BR(X, BR, case_num, auxdata)
 
 % auxdata
 rp       = auxdata.rp;
 DU       = auxdata.DU;
-VU       = auxdata.VU;
 thetatgt = auxdata.thetatgt;
 phitgt   = auxdata.phitgt;
+dlpsT    = auxdata.dlpsT;
 
 % state variables
 r = X(1); theta = X(2); phi = X(3); V = X(4); gamma = X(5); psi = X(6);
@@ -58,53 +65,46 @@ sign_ck = dot( cross(UVp,UDelp), Ur );
 % current range-to-go
 R2go = cal_sphdis(theta, phi, thetatgt, phitgt)*DU*1e-3; % km
 
-% current velocity
-Vreal = V*VU;
-
-d2r = pi/180;
-% define heading angle error limit
-if ex_case == 1 % Mars robotic
+% define heading angle error thresholds
+if case_num == 1 % Mars robotic
 
     if R2go > 100
-        del_psi_lim = 4*d2r;
+        del_psi_lim = dlpsT(1);
     else
-        del_psi_lim = 1*d2r;
+        del_psi_lim = dlpsT(2);
     end
 
-elseif ex_case == 2 % Mars human
+elseif case_num == 2 % Mars manned
 
-    if R2go > 150  % [km]
-        del_psi_lim = 8*d2r;
-    elseif R2go <= 150 && R2go > 50
-        del_psi_lim = 3*d2r;
-    elseif R2go <= 50
-        del_psi_lim = 1*d2r;
+    if R2go > 150
+        del_psi_lim = dlpsT(1);
     else
-        return
+        del_psi_lim = dlpsT(2);
     end
 
-elseif ex_case == 3 % Apollo 10
-    if R2go > 500
-        del_psi_lim = 3*d2r;
-    elseif R2go <= 500 && R2go > 10
-        del_psi_lim = 14*d2r;
-    elseif R2go <= 10
-        del_psi_lim = 30*d2r;
+elseif case_num == 3 % Mars manned new
+
+    if R2go > 150
+        del_psi_lim = dlpsT(1);
     else
-        return
+        del_psi_lim = dlpsT(2);
     end
 
-elseif ex_case == 4 % CAV-H mission
-
-    if Vreal >= 6e3
-        del_psi_lim = 10.5*d2r;
-    elseif Vreal < 6e3 && Vreal >=5e3
-        del_psi_lim = 18*d2r;
-    elseif Vreal < 5e3 && Vreal >=3e3
-        del_psi_lim = 20*d2r;
+elseif case_num == 4 % Apollo 10
+    if R2go > 150
+        del_psi_lim = dlpsT(1);
     else
-        del_psi_lim = 15*d2r;
+        del_psi_lim = dlpsT(2);
     end
+
+elseif case_num == 5 % CAV-H
+
+    if R2go > 300
+        del_psi_lim = dlpsT(1);
+    else
+        del_psi_lim = dlpsT(2);
+    end
+
 end
 
 % if current heading angle error exceeds the limit

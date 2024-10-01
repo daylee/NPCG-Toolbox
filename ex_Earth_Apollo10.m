@@ -2,6 +2,14 @@
 % ----------------------------------------------------------------------- %
 % problem formulation for the atmospheric entry phase of the
 % human Earth EDL mission, Apollo 10 command module
+% Main reference: Szelc 1969, NASA TM-X-69555
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
 
 % constants
@@ -30,7 +38,7 @@ psi0   = 71.9317*d2r;    % inertial heading angle
 
 % coordinate tranformation, inertial frame to rotating frame
 [r0, theta0, phi0, V0, gamma0, psi0] = ...
-    Aux_pci2pcr(r0, theta0, phi0, V0, gamma0, psi0, w);
+    cal_pci2pcr(r0, theta0, phi0, V0, gamma0, psi0, w);
 
 % final condition
 hf       = 5683;
@@ -49,3 +57,55 @@ BTU2kW = 11.356539; % 1 BTU/s.ft2 to kW/m^2
 kq = BTU2kW*20*1e-9;
 kqN = 0.5;
 kqM = 3;
+
+% bank angle constraints
+BAL = 1;
+siglmt = 180*d2r;   % bank magnitude limit
+sigdlmt = 15*d2r;  % bank rate limit
+sigddlmt = 15*d2r;  % bank acc limit
+
+% guidance activation time
+GAT= 90;
+
+% bank reversal logic
+BRL = 1;
+dlpsT = [5 7]*d2r;
+KBR = 6;
+
+% bank angle parameterization options
+if BAP == 1
+
+    sig0 = 70*d2r; % initial guess of the parameter to be found
+    sigf = 30*d2r; % design parameter
+
+    sigs = sig0;
+    auxdata.sigf = sigf;
+
+elseif BAP == 2
+
+    sig0 = 70*d2r; % initial guess of the parameter to be found
+    sigf = 10*d2r; % design parameter
+    KEF  = 0.9;    % design parameter
+
+    sigs = sig0;
+    auxdata.sigf = sigf;
+    auxdata.KEF = KEF;
+
+elseif BAP == 3
+
+    sig0 = 70*d2r; % initial guess of the parameter to be found
+    KEF  = 1.3; % design parameter
+
+    sigs = sig0;
+    auxdata.KEF = KEF;
+
+elseif BAP == 4
+
+    sig0 = 70*d2r; % initial guess of the parameter to be found
+
+    KLF  = 1.3; % design parameter
+
+    sigs = sig0;
+    auxdata.KLF = KLF;
+
+end

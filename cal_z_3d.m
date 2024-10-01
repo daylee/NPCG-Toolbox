@@ -1,7 +1,7 @@
 
 % ----------------------------------------------------------------------- %
-% calculate downrange and crossrange of entry vehicle to a target
-% using the parameterized bank angle of the NPCG algorithm
+% calculate downrange and crossrange at the final energy state
+% using the parameterized bank angle
 % ----------------------------------------------------------------------- %
 % input  = current state
 % output = downrange and crossrange
@@ -18,7 +18,7 @@ opt      = auxdata.opt;
 
 % propagation
 espan = [e0  ef];
-[~,X] = ode45(@(e,X) Aux_dynE_3d(e, X, convar, BR, e0, auxdata),...
+[~,X] = ode45(@(e,X) aux_dynE(e, X, convar, BR, e0, auxdata),...
     espan, X0, opt);
 
 % downrange and crossrange

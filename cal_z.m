@@ -1,12 +1,18 @@
 
 % ----------------------------------------------------------------------- %
-% calculate range-to-go at the current state
-% using the parameterized bank angle of the NPCG algorithm
+% calculate range-to-go using the parameterized bank angle
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
 % input  = current state
 % output = range-to-go in rad
 
-function z = cal_G(X0, convar, e0, auxdata)
+function z = cal_z(X0, sigs, e0, auxdata)
 
 % auxdata
 thetatgt = auxdata.thetatgt;
@@ -30,7 +36,7 @@ x0 = [0 r0 gamma0];
 espan = [e0  ef];
 
 % propagation
-[~,X] = ode45(@(e,X) Aux_dynE(e, X, convar, e0, auxdata), espan, x0, opt);
+[~,X] = ode45(@(e,X) aux_dynE_2D(e, X, sigs, e0, auxdata), espan, x0, opt);
 
 sef = X(end,1) - sf;
 

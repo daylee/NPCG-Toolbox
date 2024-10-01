@@ -1,11 +1,18 @@
 
 % ----------------------------------------------------------------------- %
-% two-dimensional entry vehicle dynamic equations
+% 2-degree of freedom equations of motion of the entry vehicle
 % based on planet-centered rotating frame and north-east-down frame
-% e = mu/r - 0.5V^2 is the independent variable
+% energy-like variable, e = mu/r - 0.5V^2, is the independent variable
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
 
-function Xdot = Aux_dynE(e, X, sigs, e0, auxdata)
+function Xdot = aux_dynE_2D(e, X, sigs, e0, auxdata)
 
 % auxdata
 pn  = auxdata.pn;
@@ -19,7 +26,7 @@ DU  = auxdata.DU;
 VU  = auxdata.VU;
 TU  = auxdata.TU;
 ef  = auxdata.ef;
-BAS = auxdata.BAS;
+BAP = auxdata.BAP;
 
 % state
 s = X(1); r = X(2); gamma = X(3); V = sqrt(2*(mu/r - e));
@@ -36,58 +43,30 @@ L = L/DU*TU^2; % unitless lift
 g = mu*r^-2;   % unitless gravity
 
 % bank angle parameterization
-if BAS == 1 % linear
+if BAP == 1 % linear
     sigf  = auxdata.sigf;
     sig0  = sigs(1);
     sigma = sig0 + (sigf - sig0)/(ef - e0)*(e - e0);
 
-elseif BAS == 2 % exponential
+elseif BAP == 2 % exponential 1
     KEF   = auxdata.KEF;
     sigf  = auxdata.sigf;
     sig0  = sigs(1);
     sigma = exp(-(e-e0)/(ef-e0)*KEF)*(sig0-sigf) + sigf;
 
-elseif BAS == 3 % exponential
+elseif BAP == 3 % exponential 2
     KEF   = auxdata.KEF;
     sig0  = sigs(1);
     sigma = sig0*exp(-(e-e0)/(ef-e0)*KEF);
 
-elseif BAS == 4 % logistic
+elseif BAP == 4 % logistic
     KLF   = auxdata.KLF;
     sig0  = sigs(1);
     sigma = 2*sig0./(1 + exp(((e-e0)/(ef-e0)*KLF)));
 
-elseif BAS == 5 % two-segment linear
-    sigf = auxdata.sigf;
-    sig0 = abs(sigs(1));
-    sigm = abs(sigs(2));
-    emid = 0.5*(e0+ef);
-    if e < emid
-        sigma = sig0 + (sig0 - sigm)/(e0 - emid)*(e - e0);
-    else
-        sigma = sigm + (sigf - sigm)/(ef - emid)*(e - emid);
-    end
-
-elseif BAS == 6 % quadratic
-    sigf = auxdata.sigf;
-    sig0 = abs(sigs(1));
-    sigm = abs(sigs(2));
-
-    a = 2*(sig0 - 2*sigm + sigf)/(e0-ef)^2;
-    b = -(sig0*e0 + 3*sig0*ef - 4*sigm*e0 - 4*sigm*ef + 3*sigf*e0 ...
-        + sigf*ef)/(e0-ef)^2;
-    c = (sig0*e0*ef + sig0*ef^2 - 4*sigm*e0*ef + sigf*e0^2 ...
-        + sigf*e0*ef)/(e0-ef)^2;
-    sigma = e.^2.*a + b.*e + c;
-
-elseif BAS == 7 % automatic linear
-    sig0 = abs(sigs(1));
-    sigf = abs(sigs(2));
-
-    sigma = sig0 + (sigf - sig0)/(ef - e0)*(e - e0);
 end
 
-% Energy-based longitudinal entry dynamics
+% energy domain 2-DoF entry dynamics
 dedt = D*V;
 dsdt = V*cos(gamma)/r;
 drdt = V*sin(gamma);

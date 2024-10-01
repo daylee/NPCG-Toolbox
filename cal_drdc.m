@@ -1,8 +1,16 @@
 
 % ----------------------------------------------------------------------- %
-% calculate downrange and crossrange of entry vehicle to a target
+% calculate downrange and crossrange
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
-% input  = longitude/latitude of initial/target/current locations in rad
+% input  = longitude and latitude of initial, target, and current
+%          locations in rad
 % output = downrange and crossrange in rad
 
 function [DR,CR] = cal_drdc(theta0, phi0, thetaf, phif, theta, phi)

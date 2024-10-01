@@ -2,6 +2,13 @@
 % ----------------------------------------------------------------------- %
 % problem formulation for the atmospheric entry phase of the
 % robotic Mars EDL mission (Mars science laboratory)
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
 
 % constants
@@ -30,9 +37,9 @@ psi0   = 93.2065*d2r;  % heading angle in deg
 
 % coordinate tranformation, inertial frame to rotating frame
 [r0, theta0, phi0, V0, gamma0, psi0] = ...
-    Aux_pci2pcr(r0, theta0, phi0, V0, gamma0, psi0, w);
+    cal_pci2pcr(r0, theta0, phi0, V0, gamma0, psi0, w);
 
-% final condition 
+% final condition
 hf       = 12000;
 rf       = hf + rp;
 Vf       = 406;
@@ -48,3 +55,56 @@ Qdotmax = 1000; % heating rate, kW/m^2
 kq = 5.3697e-8;
 kqN = 0.5;
 kqM = 3.15;
+
+% bank angle constraints
+BAL = 1;
+siglmt = 180*d2r;   % bank magnitude limit
+sigdlmt =  15*d2r;  % bank rate limit
+sigddlmt = 15*d2r;  % bank acc limit
+
+% guidance activation time
+GAT = 60;
+
+% bank reversal logic
+BRL   = 2;
+dlpsT = [4 2]*d2r;
+KBR   = 8;
+
+% bank angle parameterization options
+if BAP == 1
+
+    sig0 = 70*d2r; % initial guess of the parameter to be found
+    sigf = 20*d2r; % design parameter
+
+    sigs = sig0;
+    auxdata.sigf = sigf;
+
+elseif BAP == 2
+
+    sig0 = 70*d2r; % initial guess of the parameter to be found
+    sigf = 10*d2r; % design parameter
+    KEF  = 1.2;    % design parameter
+
+    sigs = sig0;
+    auxdata.sigf = sigf;
+    auxdata.KEF = KEF;
+
+elseif BAP == 3
+
+    sig0 = 70*d2r; % initial guess of the parameter to be found
+
+    KEF  = 1; % design parameter
+
+    sigs = sig0;
+    auxdata.KEF = KEF;
+
+elseif BAP == 4
+
+    sig0 = 70*d2r; % initial guess of the parameter to be found
+
+    KLF  = 1.4; % design parameter
+
+    sigs = sig0;
+    auxdata.KLF = KLF;
+    
+end

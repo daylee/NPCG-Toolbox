@@ -1,6 +1,13 @@
 
 % ----------------------------------------------------------------------- %
-% calculate a great-circle distance on the unit spherical surface
+% calculate a great-circle distance on an unit spherical surface
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
 % ----------------------------------------------------------------------- %
 % input  = longitude and latitude of two locations in rad
 % output = angle distance in rad

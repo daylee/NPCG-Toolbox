@@ -1,214 +1,98 @@
-% NPCG_2024.m
-% To be released  in September 2024 for AIAA Online Course
-% Numerical Predictor Corrector Guidance Toolbox (Version 2024)... 
-% with various options of a standard linear bank angle function...
-% and other variants of bank-angle shaping functions, as applied to...
-% a variety of atmospheric entry guidance problems
-
-% Coded by Dr. Youngro Lee for his PhD work under the supervision of...  
-% Prof. Dae Young Lee (daylee@iastate.edu) and Prof. Bong Wie (bongwie@iastate.edu) 
-% Iowa State University, Ames, IA 50011
-
-
-clear;clc;close all
-
-% add a path containing commonly used functions
-addpath('comfncs')
 
 % ----------------------------------------------------------------------- %
-% select the entry example case / define design parameters
+%      Numerical Predictor-Corrector Guidance Toolbox (Version 2024)
 % ----------------------------------------------------------------------- %
-%  Case_Number = atmospheric entry examples
+%    To be released in September 2024 for AIAA Online Course
+%    Numerical Predictor-Corrector Guidance Toolbox...
+%    with a standard linear bank angle parameterization...
+%    and other variants of bank angle parameterizations, as applied to...
+%    a variety of atmospheric entry guidance problems
+%
+%    Coded by Dr. Youngro Lee* for his PhD work under the supervision of
+%    Prof. Dae Young Lee** and Prof. Bong Wie***
+%    Iowa State University, Ames, IA 50011
+%    *leeyr111@gmail.com
+%    **daylee@iastate.edu
+%    ***bongwie@iastate.edu
+% ----------------------------------------------------------------------- %
+%
+%
+% ----------------------------------------------------------------------- %
+%  select the entry example (Case_Number) out of five cases
+%  select the bank angle parameterization (BAP) out of seven options
+% ----------------------------------------------------------------------- %
+% Case_Number = atmospheric entry examples
 %     1: Mars robotic mission (Mars Science Laboratory model)
-%     2: Mars human mission model of NASA (2018) 
-%     3: Mars human mission model updated in  Signialo et al (2024)
-%     4: Apollo 10
-%     5: CAV-H
+%     2: Mars manned mission model in (Jiang et al., 2019)
+%     3: Mars manned mission model updated in (Signialo et al, 2024)
+%     4: Apollo 10 (Szelc 1969)
+%     5: CAV-H (Lu 2013)
+%
+% BAP = bank angle parameterization
+%     1: linear function            (Lu 2014)
+%     2: exponential function       (Liang and Zhu 2021)
+%     3: exponential function       (Youngro Lee)
+%     4: logistic function          (Youngro Lee)
+%
+% Note!!! each BAP option has guidance parameters to be adjusted, which
+%         can be found in "ex_" scripts.
+%
+% ----------------------------------------------------------------------- %
+%  GAT, BRL, and BAL should be wisely selected for a good guidance
+%  performance. A good parameter set for each combination are already given
+%  in "ex_***", and they can be adjusted according to the user's desire.
+% ----------------------------------------------------------------------- %
 %
 % GAT = guidance activation time in seconds since entry interface (EI)
 %
-% BAL = bank angle limit
-%     1: simple magnitude contraint
-%     2: rate and acceleration constraints
-%     siglmt   = angle limit
-%     sigdlmt  = rate limit
-%     sigddlmt = acceleration limit
-%
-% BAS = bank angle shaping options
-%     1: linear function (Lu 2014)
-%     2: exponential function (Liang and Zhu 2021)
-%     3: exponential function (Youngro Lee)
-%     4: logistic function (Youngro Lee)
-%     5: two-segment linear function (Youngro Lee)  
-%     6: quadratic function(Li et al., 2019)
-%     7: automated linear function (Youngro Lee)
-%  Check lines 195-227 for additional parameters to be adjusted for each BAS option  
-
 % BRL = bank reversal logic
-%     1: conventional logic by Tu, Munir, Mease, and Bayard (JGCD 2000) 
-%     2: predictive logic by K.M. Smith (2016)
-%     KBR = damping ratio of the predictive lateral guidance
+%     1: conventional logic by Tu, Munir, Mease, and Bayard (JGCD 2000)
+%           dlpsT = heading angle error thresholds
+%     2: predictive logic by K.M. Smith (AAS 2016)
+%           KBR = damping ratio of the predictive lateral guidance
+%
+% BAL = bank angle constraints
+%     1: simple magnitude contraint
+%           siglmt   = magnitude limit
+%     2: rate and acceleration constraints
+%           sigdlmt  = rate limit
+%           sigddlmt = acceleration limit
+%
 % ----------------------------------------------------------------------- %
 
-Case_Number = 3;
+clear;clc;close all
 
+% entry example cases
+Case_Number = 1;
 
- 
-switch   Case_Number
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% bank angle parameterization options
+BAP = 1;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+switch Case_Number
+
     case 1
 
-        Mars_robotic
+        ex_Mars_robotic
 
-       GAT= 60;
+    case 2
 
-        BAL = 1;
-        siglmt = 180*d2r;   % bank angle limit
-        sigdlmt =  15*d2r;  % bank rate limit
-        sigddlmt = 15*d2r;  % bank acc limit
+        ex_Mars_manned
 
-        sig0=70*d2r; sigf =20*d2r;
+    case 3
 
-        BAS = 1;   % 7.98 km
-        BA= 2; % 7.98 km
-        BAS= 3; % 7.78 km
-       % BAS = 4;   % 8.05 km
-       % BAS =5; % 8.18 km
-        BAS = 6; % 8.07 km
-        %BAS = 7;   % 8.15 km
-       
-        BRL = 2; KBR = 7;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    case 2 
+        ex_Mars_manned_new
 
-         Mars_human
-         GAT = 160 ;
-        BAL = 1;
-        siglmt = 180*d2r;
-        sigdlmt =  15*d2r;  % bank rate limit
-        sigddlmt = 15*d2r;  % bank acc limit
-   
-        sig0=70*d2r; sigf =20*d2r; 
-
-  BAS = 1;    % crashed
-  % BAS= 2; % 0.77 km
- % BAS= 3; %1.5 km
- % BAS = 4;     %1.45 km
- % BAS = 5;  % 2.72 km
- % BAS= 6; % 3.45 km
- % BAS = 7;    %1.9 km
-
-      BRL = 2; KBR = 7;
-
-        
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        case 3
-
-         Mars_human_new
-    
-        BAL = 1;
-        siglmt = 180*d2r;    % bank angle limit
-        sigdlmt =   20*d2r;  % bank rate limit
-        sigddlmt = 20*d2r;  % bank acc limit
-  
-        sig0=70*d2r; sigf =40*d2r;
-
-  
-  BAS = 1;  GAT=175;    % 1.11 km  
-  
-  BRL = 2; KBR = 7;
-
-        
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     case 4
 
-         Earth_Apollo10
+        ex_Earth_Apollo10
 
-        GAT = 90;
-
-         BAL = 1;
-        siglmt = 180*d2r;
-        sigdlmt =  15*d2r;  % bank rate limit
-        sigddlmt = 15*d2r;  % bank acc limit
-
-          sig0=70*d2r; sigf =20*d2r;
-
-         BAS= 1;   % 5.99 km  
-        % BAS = 2; % failed
-        % BAS = 3; % failed
-        % BAS = 4;   % failed
-       % BAS = 5;  % 5.65 km
-       % BAS = 6; % failed
-       % BAS = 7; % 5.68 km
-
-           BRL = 2; KBR = 10;
-
-        
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 5
 
-         Earth_CAVH
+        ex_Earth_CAVH
 
-        GAT = 300;
-
-        BAL = 1;
-        siglmt = 180*d2r;
-        sigdlmt =  15*d2r;  % bank rate limit
-        sigddlmt = 15*d2r;  % bank acc limit
-        
-          sig0=70*d2r; sigf =20*d2r;
-
-        BAS = 1; % failed
-        BAS = 2; % 27.58 km
-        BAS = 3; % failed
-        BAS = 4; % 28.82 km
-        % BAS = 5; % not applicable
-        % BAS = 6; % not applicable
-        % BAS =7; % not applicable
-
-           BRL = 2;  KBR = 5;
-
-        POD = 1; % 0 = no damping; 1 = active damping of phugoid oscillations 
-        VFB = 4500; % velocity threshold
-        KFB = 15; % feedback gain of active damping of phugoid oscillations
 end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% bank angle shaping (BAS) options
-
-if BAS == 1 % linear function (Lu 2014)    
-    sigs = sig0;    
-    auxdata.sigf = sigf;
-
-elseif BAS == 2 % exponential function (Liang and Zhu 2021)
-    KEF  = 1;      % design parameter
-    sigs = sig0;       
-    auxdata.sigf = sigf;    
-    auxdata.KEF = KEF;
-
-elseif BAS == 3 % exponential function (Youngro Lee)
-    KEF = 0.6;     % design parameter 
-    sigs = sig0;
-    auxdata.KEF = KEF;
-
-elseif BAS == 4 % logistic function (Youngro Lee)
-    KLF = 1.3;  % design parameter     
-    sigs = sig0;
-    auxdata.KLF = KLF;
-
-elseif BAS == 5 % two-segment linear function  
-    sigm = 60*d2r; % initial guess of parameter to be found
-    sigs = [sig0; sigm];
-    auxdata.sigf = sigf;
-
-elseif BAS == 6 % quadratic function(Li et al., 2019)
-    sigm = 100*d2r; % initial guess of parameter to be found
-    sigs = [sig0; sigm];
-    auxdata.sigf = sigf;
-
-elseif BAS == 7 % automated linear function (Youngro Lee)
-    sigs = [sig0; sigf];
-end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % normalization
 DU = rp;
@@ -232,9 +116,9 @@ ef =  mu/rf - (Vf^2)/2;
 % initial bank reversal value
 delpsi0 = cal_delpsi(X0, thetatgt, phitgt);
 if sign(delpsi0) > 0
-    BRprev =   - 1;
+    BRprev = -1;
 else
-    BRprev =    1;
+    BRprev = 1;
 end
 
 % increment for Newton–Raphson method
@@ -264,8 +148,9 @@ auxdata.thetatgt = thetatgt;
 auxdata.phitgt   = phitgt;
 auxdata.ef       = ef;
 auxdata.rf       = rf;
-auxdata.BAS      = BAS;
+auxdata.BAP      = BAP;
 auxdata.KBR      = KBR;
+auxdata.dlpsT    = dlpsT;
 auxdata.opt      = opt;
 auxdata.dsig     = dsig;
 
@@ -288,7 +173,7 @@ tic
 while ec < ef
 
     if tc <= GAT/TU
-        bankcmd =0;
+        bankcmd = 0;
 
     else % guidance begin
 
@@ -297,25 +182,21 @@ while ec < ef
         while 1
 
             % range calculation
-            G = cal_G(X0, sigs, ec, auxdata);
+            G = cal_z(X0, sigs, ec, auxdata);
 
             % range condition
-            if abs(G) <= 1e2/DU
+            if abs(G) <= 1e3/DU
                 break
             end
 
-            % Jacobian
-            J = cal_J_G(X0, sigs, ec, auxdata);
-
-            % psuedo inverse
-            invJ = pinv(J);
+            % derivative
+            J = cal_J(X0, sigs, ec, auxdata);
 
             % Newton–Raphson method
-            sigs = sigs - G*invJ; % solution update
+            sigs = sigs - G/J; % solution update
 
             inum = inum + 1;
-            fprintf('Correction at t = %3.0f s, h = %3.0f km , V = %3.0f m/s \n',...
-                tc*TU, hc*DU*1e-3, Vc*VU )
+            fprintf('   Correction at t = %3.0f s \n', tc*TU)
 
             % numerical condition
             if norm(J) < 1e-6
@@ -323,12 +204,6 @@ while ec < ef
             end
         end
         testdata(end+1,:) = [tc ec sigs' inum];
-
-        if Case_Number == 5 && POD == 1
-            if Vc >= VFB/VU
-                sigs = cal_QEGC(Vc, hc, gamc, sigs, KFB, auxdata);
-            end
-        end
 
         if BAL == 1
             % bank angle  limit
@@ -339,9 +214,9 @@ while ec < ef
 
         % bank reversal logic
         if BRL == 1
-            BR = Aux_BR(X0, BRprev, ex_case, auxdata);
+            BR = cal_BR(X0, BRprev, Case_Number, auxdata);
         elseif BRL == 2
-            BR = Aux_BR_prdt(X0, ec, sigs, BRprev, auxdata);
+            BR = cal_BR_prdt(X0, ec, sigs, BRprev, auxdata);
         end
 
         if BR ~= BRprev
@@ -356,8 +231,7 @@ while ec < ef
         if BAL == 2
             % bank angle magnitude limit
             % calculation of lower bound
-            
-            
+
             tmp1 = sigcmdprv - sigdlmt*tstp; % from rate
             tmp2 = 2*sigcmdprv - sigcmdprv2 - sigddlmt*tstp^2; % from rate
             minbnk = max([tmp1, tmp2]);
@@ -373,17 +247,17 @@ while ec < ef
                 bankcmd = minbnk;
             end
             % bank angle limit
-         if abs(bankcmd) >= siglmt
+            if abs(bankcmd) >= siglmt
                 bankcmd = siglmt;
             end
             sigcmdprv2 = sigcmdprv;
             sigcmdprv = bankcmd;
         end
-         
+
     end
 
     tspan = [tc, tc + tstp/TU];
-    [tt,XX] = ode45(@(t,X) Aux_dyn(t, X, bankcmd, auxdata), tspan, X0);
+    [tt,XX] = ode45(@(t,X) aux_dyn(t, X, bankcmd, auxdata), tspan, X0);
 
     Xn = XX(end,:);
     tc = tt(end);
@@ -415,7 +289,7 @@ elpdtime = toc;
 r = X(:,1); theta = X(:,2); phi = X(:,3);
 V = X(:,4); gamma = X(:,5); psi = X(:,6);
 
-% energy
+% energy-like variable
 e =  mu./r - 0.5*V.^2;
 
 % time
@@ -460,10 +334,8 @@ DRtogo = DRtogo*1e-3;
 
 % fianl targeting error and simulation time
 disp(' ')
-disp(['Targeting Error: ', num2str(Rgof),' km'])
-disp(['Simulation Time: ', num2str(elpdtime), ' s'])
+disp([' Simulation Time: ', num2str(elpdtime, 3), ' sec'])
 disp(' ')
 
 % plotting simulation variables
-%plotting
 myplot
