@@ -1,7 +1,7 @@
 # NPCG Toolbox
 Numerical Predictor Corrector Guidance Toolbox (Iowa State University)
 
-- Version management: Dr. Bong Wie (bong@iastate.edu)
+- Version management: Dr. Bong Wie (bongwie@iastate.edu)
 
 - Site and distribution management: Dr. David Daeyoung Lee (daylee@iastate.edu)
 
